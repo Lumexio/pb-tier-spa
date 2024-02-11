@@ -1,41 +1,56 @@
 <script>
-  const items = [
-    {
-      name: 'Mojito Tier',
-      text: [
-        'Gestion de inventarios',
-        'Toma de ordenes',
-        'Cobro de cover',
-        'Comandas digitales',
-      ],
-    },
-    {
-      name: 'Beer Tier',
-      text: ['Gestion de inventarios', 'Toma de ordenes', 'Cobro de cover'],
-    },
-    {
-      name: 'Elixir Tier',
-      text: ['AIlixir'],
-    },
-  ];
+  import Api from '../lib/api/plans.js';
+  import { onMount } from 'svelte';
+
+  var tierArr = [];
+  var tierObj = {};
+  var plansArray = [];
+  export const getPlans = async () => {
+    try {
+      const response = await Api.get('api/plans');
+      tierArr = response.data;
+
+      var result = tierArr.filter((plan) => plan.name.match('Beer'));
+      if (plansArray.includes(result) != true) {
+        plansArray.push(result);
+      }
+      result = tierArr.filter((plan) => plan.name.match('Mojito'));
+      if (plansArray.includes(result) != true) {
+        plansArray.push(result);
+      }
+
+      console.log(plansArray);
+      return plansArray;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  onMount(() => {
+    getPlans();
+  });
 </script>
 
 <div class="row">
-  {#each items as item}
-    <div class="comic card">
-      <h2>{item.name}</h2>
-
-      <div class="card-text">
-        <h3>Incluye:</h3>
-        {#each item.text as text}
-          <li>{text}</li>
+  {#await getPlans()}
+    <p>Loading...</p>
+  {:then plansArray}
+    {#each plansArray as plan}
+      <!-- Render your plan data here -->
+      <div class="comic card">
+        {#each plan as tier}
+          <div class="card-text">
+            <h2>{tier.name}</h2>
+            <ul>
+              <li>{tier.amount}{tier.currency}</li>
+            </ul>
+          </div>
+          <div class="row-button">
+            <button>Subscribe</button>
+          </div>
         {/each}
       </div>
-      <div class="row-button">
-        <button type="button">Comprar</button>
-      </div>
-    </div>
-  {/each}
+    {/each}
+  {/await}
 </div>
 
 <style scoped>
@@ -46,7 +61,7 @@
     justify-content: stretch;
   }
   .card {
-    width: 100%;
+    inline-size: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
