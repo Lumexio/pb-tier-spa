@@ -1,11 +1,10 @@
 <script>
-  import MainTitle from './lib/main-block.svelte';
   import Navtop from './lib/nav-bar.svelte';
-  import TierCards from './lib/tier-cards.svelte';
+  import Router from 'svelte-spa-router';
+  import routes from './routes.js';
 </script>
 
 <main>
   <Navtop />
-  <MainTitle />
-  <TierCards />
+  <Router {routes} />
 </main>
